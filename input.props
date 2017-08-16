@@ -1,0 +1,10 @@
+DATABASE_NAME=Stocks
+CATALOG_NAME=AlphaVantage
+SCHEMA_NAME=Stocks
+DATABASE_VERSION=1.0
+SCHEMA_LOCATION=schema
+SCHEMA_TYPE=XML
+PATHTOWRITE=src
+BASEPACKAGE=com.ddtek
+DATASOURCE=Stocks
+BASE_URL=https://www.alphavantage.co/query

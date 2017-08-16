@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<project basedir="." default="build" name="build-sample-ds">
+	<property name="oa.location" value="C:\Program Files\Progress\DataDirect\oaserver80"/>
+	<property name="restgen.location" value="${oa.location}\ip\RestGenerator" />
+	<property name="datasource" value="Sample" />
+	<property name="datasource.location" value="${restgen.location}\${datasource}" />	
+	<property environment="env" />
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.6" />
+	<property name="source" value="1.6" />
+
+
+	<path id="proj.classpath">
+		<pathelement location="bin" />
+		<pathelement location="${restgen.location}/lib/cxf-api-2.7.8.jar" />
+		<pathelement location="${restgen.location}/lib/cxf-rt-bindings-xml-2.7.8.jar" />
+		<pathelement location="${restgen.location}/lib/cxf-rt-core-2.7.8.jar" />
+		<pathelement location="${restgen.location}/lib/cxf-rt-frontend-jaxrs-2.7.8.jar" />
+		<pathelement location="${restgen.location}/lib/cxf-rt-transports-http-2.7.8.jar" />
+		<pathelement location="${restgen.location}/lib/jackson-core-asl-1.8.10.jar" />
+		<pathelement location="${restgen.location}/lib/jackson-mapper-asl-1.8.10.jar" />
+		<pathelement location="${restgen.location}/lib/javax.ws.rs-api-2.0-m10.jar" />
+		<pathelement location="${restgen.location}/lib/wsdl4j-1.6.3.jar" />
+	</path>
+
+	<path id="oasql.path">
+		<pathelement location="${oa.location}/ip/oajava/oasql.jar" />
+	</path>
+
+
+	<pathconvert property="mf.classpath" pathsep=" ">
+		<path refid="proj.classpath" />
+		<mapper>
+			<chainedmapper>
+				<flattenmapper />
+				<!-- This will be set as Class-Path: entry in Manifest file -->					
+				<globmapper from="*.jar" to="../lib/*.jar" />
+			</chainedmapper>
+		</mapper>
+	</pathconvert>
+
+	<target name="build" depends="clean, build-project, clean-final" />
+
+	<target name="clean">
+		<delete dir="bin" />
+	</target>
+
+	<target name="build-project" depends="compile-project">
+		<jar destfile="${datasource.location}/${datasource}.jar" basedir="bin">
+			<manifest>
+				<attribute name="Implementation-Vendor" value="Progress Software Corporation"/>
+				<attribute name="Class-Path" value="${mf.classpath}"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="compile-project" depends="init">
+		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+			<src path="${datasource.location}\src" />
+			<classpath>
+				<path refid="proj.classpath" />
+				<path refid="oasql.path" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="init">
+		<mkdir dir="bin" />
+	</target>
+
+	<target name="clean-final">
+		<delete dir="bin" />
+		<delete dir="${datasource}.jar" />
+	</target>
+
+</project>

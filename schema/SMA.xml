@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables>
+	<table name="SMA">
+		
+		
+		<column name="Symbol" dataType="12" userData=""/>
+		<column name="Indicator" dataType="12" userData=""/>
+		<column name="LastRefreshed" dataType="12" userData=""/>
+		<column name="Interval" dataType="12" userData=""/>
+		<column name="TimePeriod"  dataType="4" userData=""/>
+		<column name="SeriesType"  dataType="12" userData=""/>
+		<column name="TimeZone"  dataType="12" userData=""/>
+		<column name="Timestamp_Recorded" dataType="12" />
+		<column name="open" dataType="8" userData=""/>
+		<column name="high" dataType="8" userData=""/>
+		<column name="low" dataType="8" userData=""/>
+		<column name="close" dataType="8" userData=""/>
+		<column name="volume" dataType="2" userData=""/>
+	
+		
+		<stat nonUnique="0" indexName="IDXSMAREC" indexType="1" seqInIndex="1" columnName="Timestamp_Recorded" cardinality="-1" pages="-1" filterConditions="" />
+		<pkfk pkColumnName="Timestamp_Recorded" keySeq="1" updateRule="-1" deleteRule="-1" pkName="PKSMAREC" />
+
+	</table>
+</tables>
