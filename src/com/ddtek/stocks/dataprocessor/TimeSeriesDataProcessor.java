@@ -170,7 +170,7 @@ public class TimeSeriesDataProcessor extends DataProcessor {
                         single_row.put("Interval", interval);
                         if(output_size != null && output_size.equalsIgnoreCase("Full size"))
                         {
-                            single_row.put("OutputSize", "Full");
+                            single_row.put("OutputSize", "full");
                         }
                         else {
                             single_row.put("OutputSize", output_size);
