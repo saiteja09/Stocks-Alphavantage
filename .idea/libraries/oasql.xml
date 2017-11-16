@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="oasql">
+    <CLASSES>
+      <root url="jar://C:/Program Files/Progress/DataDirect/oaserver80/ip/oajava/oasql.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

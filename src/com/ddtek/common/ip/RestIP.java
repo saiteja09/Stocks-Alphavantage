@@ -1,15 +1,15 @@
 package com.ddtek.common.ip;
 
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.ddtek.stocks.connection.ConnectionHelper;
 import com.ddtek.common.executor.QueryExecutor;
-import oajava.sql.jdam;
-import oajava.sql.oa_ds_info;
-import oajava.sql.xo_int;
-import oajava.sql.xo_long;
+import oajava.sql.*;
+import org.apache.commons.lang.time.DateUtils;
 
 public class RestIP implements oajava.sql.ip {
 
@@ -469,6 +469,158 @@ public class RestIP implements oajava.sql.ip {
 	public int ipStartTransaction(long arg0) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	//scalar functions decalaration
+	public scalar_function[] ipGetScalarFunctions()
+	{
+		scalar_function[] MyFuncs = new scalar_function[1];
+		MyFuncs[0]=new scalar_function("DATETRUNC", 1, "ip_func_datetrunc", XO_TYPE_TIMESTAMP , 2);
+		return MyFuncs;
+	}
+
+	//scalar function datetrunc implemetation
+	public long ip_func_datetrunc(long hstmt, long pMemTree, long hValExpList)
+	{
+		long hVal;
+		long hValExp;
+		Date truncatedDate = null;
+
+
+		xo_int piRetCode = new xo_int(0);
+		hValExp = jdam.dam_getFirstValExp(hValExpList);
+		long hValExp2 = jdam.dam_getNextValExp(hValExpList);
+
+		String intervalObj = (String)jdam.dam_getValueOfExp(pMemTree, hValExpList, hValExp, XO_TYPE_CHAR, piRetCode);
+		if(piRetCode.getVal() != DAM_SUCCESS)
+			return 0;
+		String dateObj = (String) jdam.dam_getValueOfExp(pMemTree, hValExpList, hValExp2, XO_TYPE_CHAR, piRetCode);
+		if(piRetCode.getVal() != DAM_SUCCESS)
+			return 0;
+
+		if(dateObj == null || intervalObj == null)
+		{
+			hVal = jdam.dam_createVal(pMemTree, XO_TYPE_TIMESTAMP, null, XO_NULL_DATA);
+			return hVal;
+		}
+
+
+		Date inputDate = null;
+		try {
+			inputDate = getParsedDate(dateObj);
+		}
+		catch (Exception ex)
+		{
+			jdam.dam_addError(0, 0, DAM_IP_ERROR, 0, "Exception in DATETRUNC: Unable to Parse the date \n");
+			jdam.trace(m_tmHandle, UL_TM_F_TRACE, "Exception in DATETRUNC: Unable to Parse the date \n");
+			return IP_FAILURE;
+		}
+		switch (intervalObj.toLowerCase())
+		{
+			case "millisecond":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.MILLISECOND);
+				break;
+			case "second":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.SECOND);
+				break;
+			case "minute":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.MINUTE);
+				break;
+			case "hour":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.HOUR);
+				break;
+
+			case "day":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.DATE);
+				break;
+
+			case "week":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.WEEK_OF_MONTH);
+				break;
+
+			case "month":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.MONTH);
+				break;
+
+			case "year":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.YEAR);
+				break;
+			case "monday":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.MONDAY);
+				break;
+			case "tuesday":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.TUESDAY);
+				break;
+			case "wednesday":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.WEDNESDAY);
+				break;
+			case "thursday":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.THURSDAY);
+				break;
+			case "friday":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.FRIDAY);
+				break;
+			case "saturday":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.SATURDAY);
+				break;
+			case "sunday":
+				truncatedDate = DateUtils.truncate(inputDate, Calendar.SUNDAY);
+				break;
+		}
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(truncatedDate);
+
+		xo_tm truncatedTMObj = new xo_tm(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND), calendar.get(Calendar.MILLISECOND));
+
+		hVal = jdam.dam_createVal(pMemTree, XO_TYPE_TIMESTAMP, truncatedTMObj, XO_NTS);
+
+		return  hVal;
+	}
+
+	public Date getParsedDate(String dateString) throws Exception
+	{
+		String[] patterns = new String[23];
+		patterns[0] = "yyyy-MM-dd";
+
+		patterns[1] = "yyyy-MM-dd hh:mm:ss";
+		patterns[2] = "yyyy-MM-dd'T'hh:mm:ss";
+		patterns[3] = "yyyy-MM-dd'T'hh:mm:ss'Z'";
+
+		patterns[4] = "yyyy-MM-dd hh:mm:ss.S";
+		patterns[5] = "yyyy-MM-dd hh:mm:ss.SS";
+		patterns[6] = "yyyy-MM-dd hh:mm:ss.SSS";
+		patterns[7] = "yyyy-MM-dd hh:mm:ss.SSSS";
+		patterns[8] = "yyyy-MM-dd hh:mm:ss.SSSSS";
+		patterns[9] = "yyyy-MM-dd hh:mm:ss.SSSSSS";
+
+
+		patterns[10] = "yyyy-MM-dd'T'hh:mm:ss.S";
+		patterns[11] = "yyyy-MM-dd'T'hh:mm:ss.SS";
+		patterns[12] = "yyyy-MM-dd'T'hh:mm:ss.SSS";
+		patterns[13] = "yyyy-MM-dd'T'hh:mm:ss.SSSS";
+		patterns[14] = "yyyy-MM-dd'T'hh:mm:ss.SSSSS";
+		patterns[15] = "yyyy-MM-dd'T'hh:mm:ss.SSSSSS";
+
+		patterns[16] = "yyyy-MM-dd'T'hh:mm:ss.S'Z'";
+		patterns[17] = "yyyy-MM-dd'T'hh:mm:ss.SS'Z'";
+		patterns[18] = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'";
+		patterns[19] = "yyyy-MM-dd'T'hh:mm:ss.SSSS'Z'";
+		patterns[20] = "yyyy-MM-dd'T'hh:mm:ss.SSSSS'Z'";
+		patterns[21] = "yyyy-MM-dd'T'hh:mm:ss.SSSSSS'Z'";
+
+		patterns[22] = "yyyy-MM-dd'T'hh:mm:ss.SSSSSSSXXX";
+
+		Date inputDate = null;
+		try {
+			inputDate = DateUtils.parseDate(dateString, patterns);
+		}
+		catch (Exception ex)
+		{
+			throw ex;
+		}
+
+		return inputDate;
 	}
 
 }
